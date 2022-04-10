@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="chat-info_0.0.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/cli/chat-info/dist/chat-info_0.0.1.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
