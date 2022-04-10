@@ -1,0 +1,16 @@
+{
+    "id": "8ce9454f-ba8e-4f53-a085-4ed341e22c56",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.19.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "REmLo",
+        "homepage": "https://github.com/BenderskiyMA",
+        "support": "https://github.com/BenderskiyMA"
+    },
+    "name": "Chat Info",
+    "nameSlug": "chat-info",
+    "classFile": "ChatInfoApp.ts",
+    "description": "App for list chat or channel information",
+    "implements": []
+}
