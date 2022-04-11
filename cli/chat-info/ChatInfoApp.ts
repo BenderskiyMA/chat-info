@@ -9,18 +9,18 @@ import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import {IRoom} from '@rocket.chat/apps-engine/definition/rooms';
 import {ISlashCommand, SlashCommandContext} from '@rocket.chat/apps-engine/definition/slashcommands';
 import {IUser} from '@rocket.chat/apps-engine/definition/users';
-import {IPermission} from "@rocket.chat/apps-engine/definition/permissions/IPermission";
-
 
 class InfoCommand implements ISlashCommand {
-    private readonly accessors: IAppAccessors;
-    constructor(accessors: IAppAccessors) {
-        this.accessors = accessors;
-    }
+
     public command = 'info';
     public i18nDescription = 'Just says Hello to the World!';
     public providesPreview = false;
     public i18nParamsExample = '';
+
+    private readonly accessors: IAppAccessors;
+    constructor(accessors: IAppAccessors) {
+        this.accessors = accessors;
+    }
 
     public async executor(
         context: SlashCommandContext,
@@ -32,11 +32,13 @@ class InfoCommand implements ISlashCommand {
         const creator: IModifyCreator = modify.getCreator();
         const sender: IUser = (await read.getUserReader().getAppUser()) as IUser;
         const room: IRoom = context.getRoom();
-        const roomRead: IRoomRead = this.accessors.reader.getRoomReader();
-        let msgText: string = room.displayName + ', Creator is ' + room.creator.username + ', Members are: ';
-        const users = await roomRead.getMembers(room.id);
-        for (const user of users) {
-            msgText += user.username + ' ['  + user.id + '],  ';
+        // const roomRead: IRoomRead = this.accessors.reader.getRoomReader();
+        let msgText: string;
+
+        if ((room.type === 'p') && (room.displayName) && (room.creator)) {
+        msgText = 'Room "' + room.displayName + '" was created by @' + room.creator?.username + '\n';
+        } else {
+            msgText = '/info command working only in private channels.';
         }
         const messageTemplate: IMessage = {
             text: msgText,
