@@ -13,7 +13,7 @@ import {IUser} from '@rocket.chat/apps-engine/definition/users';
 class InfoCommand implements ISlashCommand {
 
     public command = 'info';
-    public i18nDescription = 'Just says Hello to the World!';
+    public i18nDescription = 'Команда выводит имя создателя канала.!';
     public providesPreview = false;
     public i18nParamsExample = '';
 
@@ -36,9 +36,9 @@ class InfoCommand implements ISlashCommand {
         let msgText: string;
 
         if ((room.type === 'p') && (room.displayName) && (room.creator)) {
-        msgText = 'Room "' + room.displayName + '" was created by @' + room.creator?.username + '\n';
+        msgText = 'Канал "' + room.displayName + '" был создан \n@' + room.creator?.username + '\n\n';
         } else {
-            msgText = '/info command working only in private channels.';
+            msgText = '/info команда работает только в приватных каналах.';
         }
         const messageTemplate: IMessage = {
             text: msgText,
