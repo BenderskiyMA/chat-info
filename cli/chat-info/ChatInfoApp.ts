@@ -7,14 +7,15 @@ import {App} from '@rocket.chat/apps-engine/definition/App';
 import {IMessage} from '@rocket.chat/apps-engine/definition/messages';
 import {IAppInfo} from '@rocket.chat/apps-engine/definition/metadata';
 import {IRoom} from '@rocket.chat/apps-engine/definition/rooms';
+import {SettingType} from '@rocket.chat/apps-engine/definition/settings';
 import {ISlashCommand, SlashCommandContext} from '@rocket.chat/apps-engine/definition/slashcommands';
 import {IUser} from '@rocket.chat/apps-engine/definition/users';
 
 class InfoCommand implements ISlashCommand {
 
     public command = 'info';
-    public i18nDescription = 'Команда выводит имя создателя канала.!';
-    public providesPreview = false;
+    public i18nDescription = 'Команда выводит имя создателя, владельца и модераторов канала.';
+    public providesPreview = true;
     public i18nParamsExample = '';
 
     private readonly accessors: IAppAccessors;
@@ -36,8 +37,10 @@ class InfoCommand implements ISlashCommand {
         const sender: IUser = (await read.getUserReader().getAppUser()) as IUser;
         const room: IRoom = context.getRoom();
         // const roomRead: IRoomRead = this.accessors.reader.getRoomReader();
-        const moderators: Array<string> = await this.getuserlist(room.id, 'moderator', http);
-        const owners: Array<string> = await this.getuserlist(room.id, 'owner', http);
+        const token: string = await this.accessors.reader.getEnvironmentReader().getSettings().getValueById('id_info_setting_token');
+        const userid: string = await this.accessors.reader.getEnvironmentReader().getSettings().getValueById('id_info_setting_uid');
+        const moderators: Array<string> = await this.getuserlist(room.id, 'moderator', http, token, userid);
+        const owners: Array<string> = await this.getuserlist(room.id, 'owner', http, token, userid);
         let msgText: string;
         if ((room.type === 'p') && (room.displayName) && (room.creator)) {
             msgText = 'Канал *"' + room.displayName + '"* был создан @' + room.creator?.username + '\n';
@@ -62,19 +65,21 @@ class InfoCommand implements ISlashCommand {
     }
 
     // @ts-ignore
-    private async getuserlist(roomid: string, role: string, http: IHttp): Promise<Array<string>> {
+    private async getuserlist(roomid: string, role: string, http: IHttp, token: string, userid: string): Promise<Array<string>> {
         this.applogger.debug('Start: roomid=', roomid, ' role=', role, ';');
         const response: IHttpResponse = await http.get( 'http://192.168.1.249:3000/api/v1/roles.getUsersInRole?role=' + role + '&roomId=' + roomid , {
             // tslint:disable-next-line:max-line-length
-            headers : {'Content-Type' : 'application/json' , 'X-Auth-Token' : '' , 'X-User-Id' : 'XwAwpgmr385q5mYhX' },
+            headers : {'Content-Type' : 'application/json' , 'X-Auth-Token' : token , 'X-User-Id' : userid },
         });
         this.applogger.debug('Stop: roomid=', roomid, ' role=', role, ';');
         let result : Array<string> = Array();
         if (response.statusCode === 200) {
             const json = JSON.parse(response.content as string);
-            const users = json.users;
-            for (const user of users) {
-                result.push(user.username);
+            if ((json.success === 'true') && (json.total > 0)) {
+                const users = json.users;
+                for (const user of users) {
+                    result.push(user.username);
+                }
             }
         }
         return  result;
@@ -89,7 +94,6 @@ export  class ChatInfoApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
         this.appLogger = this.getLogger();
-
     }
 
     public async extendConfiguration(
@@ -98,5 +102,11 @@ export  class ChatInfoApp extends App {
         // this.getLogger().debug('test3');
         const infoCommand: InfoCommand = new InfoCommand(this.getAccessors(), this.getLogger());
         await configuration.slashCommands.provideSlashCommand(infoCommand);
+        await configuration.settings.provideSetting({
+            i18nLabel: 'user_token', packageValue: '', public: false, required: true, type: SettingType.STRING, id: 'id_info_setting_token',
+        });
+        await configuration.settings.provideSetting({
+            i18nLabel: 'user_id', packageValue: '', public: false, required: true, type: SettingType.STRING, id: 'id_info_setting_uid',
+        });
     }
 }
