@@ -2,10 +2,12 @@
 
 Rocket chat internal App for list chat or channel information (Creator, moderators, owners)
 
-Application register two setting value:
-user_token: string user_id: string
+Application register three setting value:
+user_token: string 
+user_id: string
+host_url: string 
 
-Both are required.
+All are required.
 
 Credentials used for get room roles information via next API endpoint:
 
