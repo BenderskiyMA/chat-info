@@ -21,6 +21,7 @@ class InfoCommand implements ISlashCommand {
     public i18nWasCreated = 'был создан';
     public i18nModerators = 'Модераторы канала';
     public i18nOwners = 'Владельцы канала';
+    public i18nCreator = 'Создатель канала';
     public i18nWorkingOnlyInPrivate = 'команда работает только в приватных каналах';
     public i18nCreatorNameNotSet = 'не установлен';
 
@@ -51,10 +52,10 @@ class InfoCommand implements ISlashCommand {
         let msgText: string;
         if ((room.type === 'p') && (room.displayName)) {
             let creatorName: string = this.i18nCreatorNameNotSet;
-            if (room.creator){
+            if (room.creator) {
                 creatorName = room.creator.username;
             }
-            msgText = this.i18nChannelWord + ' *"' + room.displayName + '"* ' + this.i18nWasCreated + ' @' + creatorName + '\n';
+            msgText = this.i18nChannelWord + ' *"' + room.displayName + '"* \n*' + this.i18nCreator + '*:\n @' + creatorName + '\n';
             msgText += '*' + this.i18nModerators + ':*\n';
             for (const moder of moderators) {
                 msgText += '@' + moder + '\n';
