@@ -22,6 +22,7 @@ class InfoCommand implements ISlashCommand {
     public i18nModerators = 'Модераторы канала';
     public i18nOwners = 'Владельцы канала';
     public i18nWorkingOnlyInPrivate = 'команда работает только в приватных каналах';
+    public i18nCreatorNameNotSet = 'не установлен';
 
     private readonly accessors: IAppAccessors;
     private readonly applogger: ILogger;
@@ -48,8 +49,12 @@ class InfoCommand implements ISlashCommand {
         const moderators: Array<string> = await this.getuserlist(room.id, 'moderator', http, token, userid, hosturl);
         const owners: Array<string> = await this.getuserlist(room.id, 'owner', http, token, userid, hosturl);
         let msgText: string;
-        if ((room.type === 'p') && (room.displayName) && (room.creator)) {
-            msgText = this.i18nChannelWord + ' *"' + room.displayName + '"* ' + this.i18nWasCreated + ' @' + room.creator?.username + '\n';
+        if ((room.type === 'p') && (room.displayName)) {
+            let creatorName: string = this.i18nCreatorNameNotSet;
+            if (room.creator){
+                creatorName = room.creator.username;
+            }
+            msgText = this.i18nChannelWord + ' *"' + room.displayName + '"* ' + this.i18nWasCreated + ' @' + creatorName + '\n';
             msgText += '*' + this.i18nModerators + ':*\n';
             for (const moder of moderators) {
                 msgText += '@' + moder + '\n';
