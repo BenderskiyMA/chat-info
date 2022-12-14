@@ -2,7 +2,8 @@
 
 Rocket chat internal App for list chat or channel information (Creator, moderators, owners)
 
-Application does not register any setting value
+Application does not register any setting value.
+
 With latest commit, application works with apps engine methods only.
 
 
